@@ -5,7 +5,7 @@ from wtforms import StringField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import os
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = '2GVPlajyGQbIGvmVqXiBPb4jSUGYQz3I'
