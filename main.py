@@ -30,7 +30,7 @@ class TodoApp(db.Model):
     resolved = db.Column(db.Boolean())
 
 
-# db.create_all()
+db.create_all()
 
 
 class TodoForm(FlaskForm):
