@@ -1,23 +1,7 @@
-{% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}Todo App{% endblock %}
-{% block styles %}
-{{super()}}
-<link rel="stylesheet"
-      href="{{url_for('.static', filename='styles.css')}}">
-<script src="static/scripts.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap" rel="stylesheet">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-{% endblock %}
-
+{% extends "layout.html" %}
 {% block content %}
 <div class="top">
-    <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220316/33e90c76948a1c1dd1694469604ba760.png" alt="pixel-fonts" border="0"></a>
+    <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220317/2dc3c3e95c7d38ec2e43737cc6438fbc.png" alt="pixel-fonts" border="0"></a>
 </div>
 <div class="container">
      <div class="row">
@@ -31,7 +15,7 @@
 </div>
 
 <div class="top">
-    <footer>Created by Scott with Flask, Flask-WTForms, Flask-Bootstrap and Flask-SQLAlchemy. Header from <a
+    <footer>Created by Scott. Built with Flask. Header from <a
             href="https://fontmeme.com/pixel-fonts/">Font Meme</a></footer>
 </div>
 {% endblock %}

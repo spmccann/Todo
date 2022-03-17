@@ -1,29 +1,17 @@
-{% extends "bootstrap/base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
-{% block title %}Todo App{% endblock %}
-{% block styles %}
-{{super()}}
-<link rel="stylesheet"
-      href="{{url_for('.static', filename='styles.css')}}">
-<script src="static/scripts.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap" rel="stylesheet">
-<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-{% endblock %}
-
+{% extends "layout.html" %}
 {% block content %}
 <div class="top">
-    <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220316/33e90c76948a1c1dd1694469604ba760.png" alt="pixel-fonts" border="0"></a>
-
+    <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220317/2dc3c3e95c7d38ec2e43737cc6438fbc.png"
+                                        alt="pixel-fonts" border="0"></a>
 </div>
 <div class="container">
-     <div class="row">
-         <h4>Fries Todo will help you add, edit and resolve tasks</h4>
-          <p>You currently have {{ count }} open tasks and {{ resolved }} <a href="{{ url_for('show_resolved') }}">resolved</a> tasks</p>
-         <button class="btn btn-warning" onclick="hideAdd()">New Task</button>
+    <div class="row">
+        <h4>Fries Todo will help you add, edit and resolve tasks</h4>
+        <p>You currently have {{ count }} open tasks and {{ resolved }} <a href="{{ url_for('show_resolved') }}">resolved</a>
+            tasks</p>
+        <button class="btn btn-warning" onclick="hideAdd()">New Task</button>
         <div id="addTask">
-         {{ wtf.quick_form(form, button_map={"submit": "success"}) }}
+            {{ wtf.quick_form(form, button_map={"submit": "success"}) }}
         </div>
 
     </div>
@@ -35,7 +23,11 @@
             <p><strong>Description:</strong> <br> {{ todo.description }}</p>
             <p><strong>Priority:</strong> {{ todo.priority }}</p>
 
-            <a title="resolved" href="{{ url_for('resolve_task', task=todo.id) }}">✅</a> | <a title="edit" href="{{ url_for('edit_task', task=todo.id) }}">✏️</a> | <a title="delete" href="{{url_for('delete_task', task=todo.id)}}">❌</a> <a title="task" href="{{ url_for('show_task', task=todo.id) }}">{{ todo.date }}</a>
+            <a title="resolved" href="{{ url_for('resolve_task', task=todo.id) }}">✅</a> | <a title="edit"
+                                                                                              href="{{ url_for('edit_task', task=todo.id) }}">✏️</a>
+            | <a title="delete" href="{{url_for('delete_task', task=todo.id)}}">❌</a> <a title="task"
+                                                                                         href="{{ url_for('show_task', task=todo.id) }}">{{
+            todo.date }}</a>
 
         </div>
         {% endfor %}
@@ -43,7 +35,9 @@
 </div>
 
 <div class="top">
-    <footer>Created by Scott with Flask, Flask-WTForms, Flask-Bootstrap and Flask-SQLAlchemy. Header from <a
+    <footer>Created by Scott. Built with Flask. Header from <a
             href="https://fontmeme.com/pixel-fonts/">Font Meme</a></footer>
 </div>
+
 {% endblock %}
+
