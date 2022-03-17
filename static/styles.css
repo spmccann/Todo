@@ -1,20 +1,21 @@
 body{
     margin: 30px;
     font-family: 'Space Grotesk', sans-serif;
+    background: white url("/static/images/todo-fries-bg.jpg") no-repeat fixed center;
 }
 
 .container {
-    max-width: 500px;
+    max-width: 600px;
     margin: 10px auto 20px auto;
     padding: 5px;
 
 }
 
 .top {
-    text-align: center;
     margin-top: 20px;
     width: 50%;
     margin: auto;
+    text-align: center;
 }
 
 
@@ -35,7 +36,8 @@ a:active {
 }
 
 .row {
-
+    background: white;
+    padding-left: 5px;
 }
 
 #addTask {
@@ -46,8 +48,8 @@ p {
     padding-top: 5px;
 }
 
-.square:nth-child(even) {background: #CCC}
-.square:nth-child(odd) {background: #ECECEC}
+.square:nth-child(even) {background: #D0D0D0}
+.square:nth-child(odd) {background: #E5E5E5}
 
 .square {
     padding: 5px;

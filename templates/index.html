@@ -3,11 +3,12 @@
 <div class="top">
     <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220317/2dc3c3e95c7d38ec2e43737cc6438fbc.png"
                                         alt="pixel-fonts" border="0"></a>
+
 </div>
 <div class="container">
     <div class="row">
-        <h4>Fries Todo will help you add, edit and resolve tasks</h4>
-        <p>You currently have {{ count }} open tasks and {{ resolved }} <a href="{{ url_for('show_resolved') }}">resolved</a>
+        <h4>Todo Fries will help you add, edit and resolve tasks</h4>
+        <p>You currently have {{ count }} active🍟 tasks and {{ resolved }} <a href="{{ url_for('show_resolved') }}">resolved 🍟</a>
             tasks</p>
         <button class="btn btn-warning" onclick="hideAdd()">New Task</button>
         <div id="addTask">
@@ -16,7 +17,7 @@
 
     </div>
     <div class="row">
-        <h4>Open Tasks</h4>
+        <h4>Active Tasks</h4>
         {% for todo in todos|reverse %}
         <div class="square">
             <p><strong>Task:</strong> {{ todo.title }}</p>
@@ -31,13 +32,13 @@
 
         </div>
         {% endfor %}
+
+    <footer>Created by Scott. Built with Flask. 2022</footer>
+
     </div>
 </div>
 
-<div class="top">
-    <footer>Created by Scott. Built with Flask. Header from <a
-            href="https://fontmeme.com/pixel-fonts/">Font Meme</a></footer>
-</div>
+
 
 {% endblock %}
 
