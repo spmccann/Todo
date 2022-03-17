@@ -27,7 +27,7 @@ class TodoApp(db.Model):
     description = db.Column(db.String(500))
     priority = db.Column(db.String(25))
     date = db.Column(db.String(100))
-    resolved = db.Column(db.Boolean())
+    resolved = db.Column(db.Integer)
 
 
 db.create_all()
@@ -42,8 +42,8 @@ class TodoForm(FlaskForm):
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    open_todos = TodoApp.query.filter(TodoApp.resolved != 1).all()
-    count_open = TodoApp.query.filter(TodoApp.resolved != 1).count()
+    open_todos = TodoApp.query.filter(TodoApp.resolved == 0).all()
+    count_open = TodoApp.query.filter(TodoApp.resolved == 0).count()
     count_resolved = TodoApp.query.filter_by(resolved=1).count()
     form = TodoForm()
     if request.method == "POST":
