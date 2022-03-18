@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, SelectField
+from wtforms import StringField, TextAreaField, SubmitField, SelectField, EmailField, PasswordField, RadioField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -11,7 +11,6 @@ import re
 uri = os.getenv("DATABASE_URL", "sqlite:///todo.db")  # or other relevant config var
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
@@ -40,19 +39,35 @@ class TodoForm(FlaskForm):
     submit = SubmitField('Add')
 
 
+class SignUp(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired()])
+    password = PasswordField('New Password', validators=[DataRequired()])
+    submit = SubmitField('Register')
+
+
+class SignIn(FlaskForm):
+    email = EmailField('Email', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Log In')
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     open_todos = TodoApp.query.filter(TodoApp.resolved == 0).all()
     count_open = TodoApp.query.filter(TodoApp.resolved == 0).count()
     count_resolved = TodoApp.query.filter_by(resolved=1).count()
-    form = TodoForm()
+    task_form = TodoForm()
+    sign_up_form = SignUp()
+    sign_in_form = SignIn()
     if request.method == "POST":
-        new_todo = TodoApp(title=form.title.data, description=form.description.data,
-                           priority=form.priority.data, date=datetime.now().strftime("%c"), resolved=0)
+        new_todo = TodoApp(title=task_form.title.data, description=task_form.description.data,
+                           priority=task_form.priority.data, date=datetime.now().strftime("%c"), resolved=0)
         db.session.add(new_todo)
         db.session.commit()
         return redirect(url_for('home'))
-    return render_template("index.html", todos=open_todos, form=form, count=count_open, resolved=count_resolved)
+    return render_template("index.html", todos=open_todos, task_form=task_form, count=count_open,
+                           resolved=count_resolved)
 
 
 @app.route("/task/<int:task>")

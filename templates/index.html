@@ -3,21 +3,24 @@
 <div class="top">
     <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220317/2dc3c3e95c7d38ec2e43737cc6438fbc.png"
                                         alt="pixel-fonts" border="0"></a>
-
+<h4>Todo Fries helps you add, update and resolve tasks</h4>
 </div>
 <div class="container">
     <div class="row">
-        <h4>Todo Fries will help you add, edit and resolve tasks</h4>
-        <p>You currently have {{ count }} active🍟 tasks and {{ resolved }} <a href="{{ url_for('show_resolved') }}">resolved 🍟</a>
-            tasks</p>
-        <button class="btn btn-warning" onclick="hideAdd()">New Task</button>
-        <div id="addTask">
-            {{ wtf.quick_form(form, button_map={"submit": "success"}) }}
-        </div>
 
+
+        <button class="btn btn-warning" onclick="hideAdd()">New Task</button>
+        <span class="signregister">
+            <a href="#" class="btn btn-primary">Sign In</a>
+            <a href="#" class="btn btn-danger">Sign Up</a>
+            </span>
+        <div id="addTask">
+            {{ wtf.quick_form(task_form, button_map={"submit": "success"}) }}
+        </div>
     </div>
     <div class="row">
-        <h4>Active Tasks</h4>
+        <h4>Active Tasks <span class="signregister">{{ count }} active {{ resolved }} <a class="text-danger" href="{{ url_for('show_resolved') }}">resolved</a>
+        </span></h4>
         {% for todo in todos|reverse %}
         <div class="square">
             <p><strong>Task:</strong> {{ todo.title }}</p>
@@ -26,18 +29,21 @@
 
             <a title="resolved" href="{{ url_for('resolve_task', task=todo.id) }}">✅</a> | <a title="edit"
                                                                                               href="{{ url_for('edit_task', task=todo.id) }}">✏️</a>
-            | <a title="delete" href="{{url_for('delete_task', task=todo.id)}}">❌</a> <a title="task"
+            | <a title="delete" href="{{url_for('delete_task', task=todo.id)}}">❌</a> <a class="text-danger" title="task"
                                                                                          href="{{ url_for('show_task', task=todo.id) }}">{{
             todo.date }}</a>
-
+            <hr>
         </div>
         {% endfor %}
+        <p> <a class="text-danger" href="{{ url_for('show_resolved') }}">See {{ resolved }} resolved tasks </a></p>
 
-    <footer>Created by Scott. Built with Flask. 2022</footer>
 
     </div>
-</div>
 
+</div>
+<div class="top">
+    <footer>Created by Scott. Built with Flask. 2022</footer>
+</div>
 
 
 {% endblock %}
