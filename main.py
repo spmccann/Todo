@@ -1,12 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
+from flask_login import LoginManager, login_user, UserMixin, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, SelectField, EmailField, PasswordField, RadioField
+from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms import StringField, TextAreaField, SubmitField, SelectField, EmailField, PasswordField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
-import re
 
 uri = os.getenv("DATABASE_URL", "sqlite:///todo.db")  # or other relevant config var
 if uri.startswith("postgres://"):
@@ -18,6 +19,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 Bootstrap(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 class TodoApp(db.Model):
@@ -29,7 +32,15 @@ class TodoApp(db.Model):
     resolved = db.Column(db.Integer)
 
 
-db.create_all()
+class User(UserMixin, db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    name = db.Column(db.String(100))
+    password = db.Column(db.String(100), unique=True, nullable=False)
+
+
+# db.create_all()
 
 
 class TodoForm(FlaskForm):
@@ -39,17 +50,22 @@ class TodoForm(FlaskForm):
     submit = SubmitField('Add')
 
 
-class SignUp(FlaskForm):
+class SignUpForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired()])
     name = StringField('Name', validators=[DataRequired()])
     password = PasswordField('New Password', validators=[DataRequired()])
     submit = SubmitField('Register')
 
 
-class SignIn(FlaskForm):
+class SignInForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Log In')
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -58,16 +74,22 @@ def home():
     count_open = TodoApp.query.filter(TodoApp.resolved == 0).count()
     count_resolved = TodoApp.query.filter_by(resolved=1).count()
     task_form = TodoForm()
-    sign_up_form = SignUp()
-    sign_in_form = SignIn()
-    if request.method == "POST":
+    if task_form.validate_on_submit() and current_user.is_authenticated:
         new_todo = TodoApp(title=task_form.title.data, description=task_form.description.data,
                            priority=task_form.priority.data, date=datetime.now().strftime("%c"), resolved=0)
         db.session.add(new_todo)
         db.session.commit()
         return redirect(url_for('home'))
+    else:
+        flash("Please sign in/register!")
+    sign_in_form = SignInForm()
+    if sign_in_form.validate_on_submit():
+        user = User.query.filter_by(email=sign_in_form.email.data).first()
+        if user:
+            if check_password_hash(user.password, sign_in_form.password.data):
+                login_user(user)
     return render_template("index.html", todos=open_todos, task_form=task_form, count=count_open,
-                           resolved=count_resolved)
+                           resolved=count_resolved, sign_in_form=sign_in_form)
 
 
 @app.route("/task/<int:task>")
@@ -110,6 +132,27 @@ def edit_task(task):
         db.session.commit()
         return redirect(url_for('home'))
     return render_template('edit.html', form=edit_form)
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    sign_up_form = SignUpForm()
+    if sign_up_form.validate_on_submit():
+        new_user = User(email=sign_up_form.email.data, name=sign_up_form.name.data,
+                        password=generate_password_hash(sign_up_form.password.data, method='pbkdf2:sha256',
+                                                        salt_length=8))
+        db.session.add(new_user)
+        db.session.commit()
+        login_user(new_user)
+        return redirect(url_for('home'))
+    return render_template('signup.html', sign_up_form=sign_up_form)
+
+
+@app.route('/logout')
+def signout():
+    logout_user()
+    return redirect(url_for('home'))
+
 
 
 if __name__ == "__main__":

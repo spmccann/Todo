@@ -4,19 +4,35 @@
     <a href="{{ url_for('home')}}"><img src="https://fontmeme.com/permalink/220317/2dc3c3e95c7d38ec2e43737cc6438fbc.png"
                                         alt="pixel-fonts" border="0"></a>
 <h4>Todo Fries helps you add, update and resolve tasks</h4>
+    </div>
+
 </div>
 <div class="container">
     <div class="row">
-
-
-        <button class="btn btn-warning" onclick="hideAdd()">New Task</button>
-        <span class="signregister">
-            <a href="#" class="btn btn-primary">Sign In</a>
-            <a href="#" class="btn btn-danger">Sign Up</a>
+        <button class="btn btn-warning btn-sm" onclick="hideAdd()">New Task</button>
+          {% if current_user.is_authenticated %}
+            <span class="signregister">
+         <a hre="#"> Hi {{ current_user.name }}! </a>
+            <a href="{{ url_for('signout') }}" class="btn btn-danger btn-sm">Sign Out</a>
             </span>
+            {% else %}
+            <strong>Sign in/Register to start using Todo Fries</strong>
+        <span class="signregister">
+                 <a href="{{ url_for('signup') }}" class="btn btn-danger btn-sm">Register</a>
+             <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Sign In
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  {{ wtf.quick_form(sign_in_form, novalidate=True, button_map={"submit": "success"}) }}
+            </div>
+            </span>
+            {% endif %}
+
+         {% if current_user.is_authenticated %}
         <div id="addTask">
-            {{ wtf.quick_form(task_form, button_map={"submit": "success"}) }}
+            {{ wtf.quick_form(task_form, novalidate=True, button_map={"submit": "success"}) }}
         </div>
+        {% endif %}
     </div>
     <div class="row">
         <h4>Active Tasks <span class="signregister">{{ count }} active {{ resolved }} <a class="text-danger" href="{{ url_for('show_resolved') }}">resolved</a>
