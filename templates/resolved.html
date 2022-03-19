@@ -19,10 +19,11 @@
             <hr>
         </div>
         {% endfor %}
+        <p> <a class="text-danger" href="{{ url_for('home') }}">Return to Home </a></p>
     </div>
 </div>
 
 <div class="top">
-    <footer>Created by Scott. Built with Flask. 2022</footer>
+    <footer>Created by Scott. Built with <a href="https://flask.palletsprojects.com/en/2.0.x/" target="_blank">Flask</a>. 2022</footer>
 </div>
 {% endblock %}

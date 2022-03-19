@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
-from flask_login import LoginManager, login_user, UserMixin, logout_user, current_user
+from flask_login import LoginManager, login_user, UserMixin, logout_user, current_user, login_required
 from flask_wtf import FlaskForm
+from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms import StringField, TextAreaField, SubmitField, SelectField, EmailField, PasswordField
 from wtforms.validators import DataRequired
@@ -25,6 +26,8 @@ login_manager.init_app(app)
 
 class TodoApp(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    author = relationship("User", back_populates="tasks")
     title = db.Column(db.String(100))
     description = db.Column(db.String(500))
     priority = db.Column(db.String(25))
@@ -38,15 +41,16 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(100))
     password = db.Column(db.String(100), unique=True, nullable=False)
+    tasks = relationship("TodoApp", back_populates="author")
 
 
 # db.create_all()
 
 
 class TodoForm(FlaskForm):
-    title = StringField('Task', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[DataRequired()])
-    priority = SelectField('Priority', choices=['Low', 'Medium', 'High'])
+    title = StringField('Task')
+    description = TextAreaField('Description')
+    priority = SelectField('Priority', choices=[' ', 'Low', 'Medium', 'High'])
     submit = SubmitField('Add')
 
 
@@ -70,41 +74,49 @@ def load_user(user_id):
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    open_todos = TodoApp.query.filter(TodoApp.resolved == 0).all()
-    count_open = TodoApp.query.filter(TodoApp.resolved == 0).count()
-    count_resolved = TodoApp.query.filter_by(resolved=1).count()
-    task_form = TodoForm()
-    if task_form.validate_on_submit() and current_user.is_authenticated:
-        new_todo = TodoApp(title=task_form.title.data, description=task_form.description.data,
-                           priority=task_form.priority.data, date=datetime.now().strftime("%c"), resolved=0)
-        db.session.add(new_todo)
-        db.session.commit()
-        return redirect(url_for('home'))
-    else:
-        flash("Please sign in/register!")
-    sign_in_form = SignInForm()
-    if sign_in_form.validate_on_submit():
-        user = User.query.filter_by(email=sign_in_form.email.data).first()
-        if user:
-            if check_password_hash(user.password, sign_in_form.password.data):
-                login_user(user)
-    return render_template("index.html", todos=open_todos, task_form=task_form, count=count_open,
-                           resolved=count_resolved, sign_in_form=sign_in_form)
+    if current_user.is_authenticated:
+        open_todos = TodoApp.query.filter(TodoApp.resolved == 0).filter(TodoApp.author_id == current_user.id).all()
+        count_open = TodoApp.query.filter(TodoApp.resolved == 0).filter(TodoApp.author_id == current_user.id).count()
+        count_resolved = TodoApp.query.filter(TodoApp.resolved == 1).filter(TodoApp.author_id == current_user.id).count()
+        task_form = TodoForm()
+        if task_form.validate_on_submit():
+            new_todo = TodoApp(title=task_form.title.data, description=task_form.description.data,
+                               priority=task_form.priority.data, date=datetime.now().strftime("%c"), resolved=0,
+                               author=current_user)
+            db.session.add(new_todo)
+            db.session.commit()
+            return redirect(url_for('home'))
+        else:
+            flash("Please sign in/register!")
 
+        return render_template("index.html", todos=open_todos, task_form=task_form, count=count_open,
+                               resolved=count_resolved)
+    else:
+        sign_in_form = SignInForm()
+        if sign_in_form.validate_on_submit():
+            user = User.query.filter_by(email=sign_in_form.email.data).first()
+            if user:
+                if check_password_hash(user.password, sign_in_form.password.data):
+                    login_user(user)
+                    return redirect(url_for('home'))
+        return render_template("index.html", sign_in_form=sign_in_form)
 
 @app.route("/task/<int:task>")
+@login_required
 def show_task(task):
     requested_task = TodoApp.query.get(task)
     return render_template("show.html", task=requested_task)
 
 
 @app.route("/resolved")
+@login_required
 def show_resolved():
     resolved_todos = TodoApp.query.filter(TodoApp.resolved == 1).all()
     return render_template("resolved.html", todos=resolved_todos)
 
 
 @app.route("/delete/<int:task>")
+@login_required
 def delete_task(task):
     get_task = TodoApp.query.get(task)
     db.session.delete(get_task)
@@ -113,6 +125,7 @@ def delete_task(task):
 
 
 @app.route("/done/<int:task>")
+@login_required
 def resolve_task(task):
     get_task = TodoApp.query.get(task)
     get_task.resolved = 1
@@ -121,6 +134,7 @@ def resolve_task(task):
 
 
 @app.route("/edit/<int:task>", methods=["GET", "POST"])
+@login_required
 def edit_task(task):
     task_to_edit = TodoApp.query.get(task)
     edit_form = TodoForm(title=task_to_edit.title,
@@ -149,10 +163,10 @@ def signup():
 
 
 @app.route('/logout')
+@login_required
 def signout():
     logout_user()
     return redirect(url_for('home'))
-
 
 
 if __name__ == "__main__":

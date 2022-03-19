@@ -12,13 +12,13 @@
             <p><strong>Priority:</strong> {{ task.priority }}</p>
 
             <a href="{{ url_for('resolve_task', task=task.id) }}">✅</a> | <a href="{{ url_for('edit_task', task=task.id) }}">✏️</a> | <a href="{{url_for('delete_task', task=task.id)}}">❌</a> <a href="#">{{ task.date }}</a>
-            <hr>
-        </div>
 
+        </div>
+        <p> <a class="text-danger" href="{{ url_for('home') }}">Return to Home </a></p>
     </div>
 </div>
 
 <div class="top">
-    <footer>Created by Scott. Built with Flask. 2022</footer>
+    <footer>Created by Scott. Built with <a href="https://flask.palletsprojects.com/en/2.0.x/" target="_blank">Flask</a>. 2022</footer>
 </div>
 {% endblock %}

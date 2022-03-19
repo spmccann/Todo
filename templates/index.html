@@ -12,7 +12,7 @@
         <button class="btn btn-warning btn-sm" onclick="hideAdd()">New Task</button>
           {% if current_user.is_authenticated %}
             <span class="signregister">
-         <a hre="#"> Hi {{ current_user.name }}! </a>
+         <a hre="# " class="text-danger"> Hi {{ current_user.name.title()}}! </a>
             <a href="{{ url_for('signout') }}" class="btn btn-danger btn-sm">Sign Out</a>
             </span>
             {% else %}
@@ -26,13 +26,19 @@
                   {{ wtf.quick_form(sign_in_form, novalidate=True, button_map={"submit": "success"}) }}
             </div>
             </span>
+        <h3>Benefits of joining Todo Fries:</h3>
+            <ol>
+                <li>Be the coolest person you know!</li>
+                <li>Keep track of what's important in your life.</li>
+                <li>You will instantly become more attractive!</li>
+            </ol>
             {% endif %}
 
          {% if current_user.is_authenticated %}
         <div id="addTask">
             {{ wtf.quick_form(task_form, novalidate=True, button_map={"submit": "success"}) }}
         </div>
-        {% endif %}
+
     </div>
     <div class="row">
         <h4>Active Tasks <span class="signregister">{{ count }} active {{ resolved }} <a class="text-danger" href="{{ url_for('show_resolved') }}">resolved</a>
@@ -42,7 +48,7 @@
             <p><strong>Task:</strong> {{ todo.title }}</p>
             <p><strong>Description:</strong> <br> {{ todo.description }}</p>
             <p><strong>Priority:</strong> {{ todo.priority }}</p>
-
+            {{ todo.author.name }}
             <a title="resolved" href="{{ url_for('resolve_task', task=todo.id) }}">✅</a> | <a title="edit"
                                                                                               href="{{ url_for('edit_task', task=todo.id) }}">✏️</a>
             | <a title="delete" href="{{url_for('delete_task', task=todo.id)}}">❌</a> <a class="text-danger" title="task"
@@ -53,12 +59,12 @@
         {% endfor %}
         <p> <a class="text-danger" href="{{ url_for('show_resolved') }}">See {{ resolved }} resolved tasks </a></p>
 
-
+        {% endif %}
     </div>
 
 </div>
 <div class="top">
-    <footer>Created by Scott. Built with Flask. 2022</footer>
+    <footer>Created by Scott. Built with <a href="https://flask.palletsprojects.com/en/2.0.x/" target="_blank">Flask</a>. 2022</footer>
 </div>
 
 
