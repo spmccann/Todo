@@ -44,7 +44,7 @@ class User(UserMixin, db.Model):
     tasks = relationship("TodoApp", back_populates="author")
 
 
-# db.create_all()
+db.create_all()
 
 
 class TodoForm(FlaskForm):
