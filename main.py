@@ -86,9 +86,6 @@ def home():
             db.session.add(new_todo)
             db.session.commit()
             return redirect(url_for('home'))
-        else:
-            flash("Please sign in/register!")
-
         return render_template("index.html", todos=open_todos, task_form=task_form, count=count_open,
                                resolved=count_resolved)
     else:
@@ -112,7 +109,7 @@ def show_task(task):
 @app.route("/resolved")
 @login_required
 def show_resolved():
-    resolved_todos = TodoApp.query.filter(TodoApp.resolved == 1).all()
+    resolved_todos = TodoApp.query.filter(TodoApp.resolved == 1).filter(TodoApp.author_id == current_user.id).all()
     return render_template("resolved.html", todos=resolved_todos)
 
 
