@@ -101,6 +101,7 @@ def home():
                     return redirect(url_for('home'))
         return render_template("index.html", sign_in_form=sign_in_form)
 
+
 @app.route("/task/<int:task>")
 @login_required
 def show_task(task):
